@@ -136,20 +136,27 @@ angular.module('groupList').directive('guacGroupListFilter', [function guacGroup
                 // Flatten all children to the top-level group
                 angular.forEach(connectionGroup.childConnectionGroups, function flattenChild(child) {
 
-                    var flattenedChild = flattenConnectionGroup(child);
+                	console.log('flattenConnectionGroup child: ' + child);
 
-                    // Merge all child connections
-                    Array.prototype.push.apply(
-                        connectionGroup.childConnections,
-                        flattenedChild.childConnections
-                    );
+                    // CS
+                	if (child.attributes.filter != 'false') {
 
-                    // Merge all child connection groups
-                    Array.prototype.push.apply(
-                        connectionGroup.childConnectionGroups,
-                        flattenedChild.childConnectionGroups
-                    );
+                        var flattenedChild = flattenConnectionGroup(child);
 
+	                    // Merge all child connections
+	                    Array.prototype.push.apply(
+	                        connectionGroup.childConnections,
+	                        flattenedChild.childConnections
+	                    );
+	
+	                    // Merge all child connection groups
+	                    Array.prototype.push.apply(
+	                        connectionGroup.childConnectionGroups,
+	                        flattenedChild.childConnectionGroups
+	                    );
+                    
+                    // CS
+                	}
                 });
 
                 return connectionGroup;
@@ -241,7 +248,44 @@ angular.module('groupList').directive('guacGroupListFilter', [function guacGroup
              */
             var filterConnectionGroup = function filterConnectionGroup(connectionGroup) {
                 connectionGroup.childConnections = connectionGroup.childConnections.filter(connectionFilterPattern.predicate);
-                connectionGroup.childConnectionGroups = connectionGroup.childConnectionGroups.filter(connectionGroupFilterPattern.predicate);
+                
+                if (connectionGroup.childConnectionGroups) {
+	                connectionGroup.childConnectionGroups = connectionGroup.childConnectionGroups.filter(connectionGroupFilterPattern.predicate);
+	                
+	                angular.forEach(connectionGroup.childConnectionGroups, function filterChild(child) {
+	                	if (child.attributes.filter == 'false') {
+	                		filterConnectionGroup(child);
+	                	}
+	                });
+	                
+	                connectionGroup.childConnectionGroups = connectionGroup.childConnectionGroups.filter(function filterEmptyGroup(child) {
+	                    console.log(child);
+	                    console.log(child.name);
+	                    console.log(child.childConnectionGroups);
+	                    if (child.childConnectionGroups) {
+	                    	console.log(child.childConnectionGroups.length);
+	                    }
+	                    console.log(child.childConnections);
+	                    if (child.childConnections) {
+	                    	console.log(child.childConnections.length);
+	                    }
+	                    
+	                    if (child.childConnectionGroups) {
+	                    	if (child.childConnectionGroups.length > 0) {
+	                    		console.log('true');
+	                    		return true;
+	                    	}
+	                    }
+	                    if (child.childConnections) {
+	                    	if (child.childConnections.length > 0) {
+	                    		console.log('true');
+	                    		return true;
+	                    	}
+	                    }
+                		console.log('false');
+	                    return false;
+	                });
+                }
             };
 
             /**
@@ -274,6 +318,7 @@ angular.module('groupList').directive('guacGroupListFilter', [function guacGroup
                             filterGroupListItem(filteredGroup);
                         }
                         else {
+                        	console.log('updateFilteredConnectionGroup connectionGroup: ' + connectionGroup);
                             filteredGroup = flattenConnectionGroup(connectionGroup);
                             filterConnectionGroup(filteredGroup);
                         }

@@ -421,9 +421,9 @@ public class ExtensionModule extends ServletModule {
         // Load initial language resources from servlet context
         languageResourceService.addLanguageResources(getServletContext());
 
-        // Init JavaScript resources with base guacamole.min.js
+        // Init JavaScript resources with base guacamole.js
         Collection<Resource> javaScriptResources = new ArrayList<Resource>();
-        javaScriptResources.add(new WebApplicationResource(getServletContext(), "/guacamole.min.js"));
+        javaScriptResources.add(new WebApplicationResource(getServletContext(), "/guacamole.js"));
 
         // Init CSS resources with base guacamole.min.css
         Collection<Resource> cssResources = new ArrayList<Resource>();

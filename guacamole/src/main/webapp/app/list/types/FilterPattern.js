@@ -235,6 +235,15 @@ angular.module('list').factory('FilterPattern', ['$injector',
             // Return predicate which matches against the value of any getter in the getters array
             filterPattern.predicate = function matchesAllTokens(object) {
 
+            	// CS: inizio modifiche
+            	if (object.type == 'ORGANIZATIONAL' && object.attributes.filter == 'false') {
+                	//console.log(object);
+            		//console.log('attributes: ' + object.attributes);
+            		//console.log('filter: ' + object.attributes.filter);
+            		return true;
+            	}
+            	// CS: fine modifiche
+            	
                 // False if any token does not match
                 for (var i=0; i < tokens.length; i++) {
                     if (!matchesToken(object, tokens[i]))
