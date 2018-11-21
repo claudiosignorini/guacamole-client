@@ -136,7 +136,7 @@ angular.module('groupList').directive('guacGroupListFilter', [function guacGroup
                 // Flatten all children to the top-level group
                 angular.forEach(connectionGroup.childConnectionGroups, function flattenChild(child) {
 
-                	console.log('flattenConnectionGroup child: ' + child);
+//                	console.log('flattenConnectionGroup child: ' + child);
 
                     // CS
                 	if (child.attributes.filter != 'false') {
@@ -247,42 +247,46 @@ angular.module('groupList').directive('guacGroupListFilter', [function guacGroup
              *     The connection group whose children should be filtered.
              */
             var filterConnectionGroup = function filterConnectionGroup(connectionGroup) {
-                connectionGroup.childConnections = connectionGroup.childConnections.filter(connectionFilterPattern.predicate);
+            	if (connectionGroup.childConnections) {
+            		connectionGroup.childConnections = connectionGroup.childConnections.filter(connectionFilterPattern.predicate);
+            	}
                 
                 if (connectionGroup.childConnectionGroups) {
 	                connectionGroup.childConnectionGroups = connectionGroup.childConnectionGroups.filter(connectionGroupFilterPattern.predicate);
 	                
 	                angular.forEach(connectionGroup.childConnectionGroups, function filterChild(child) {
-	                	if (child.attributes.filter == 'false') {
+//	                	console.log("child.name: " + child.name);
+//	                	console.log("predicate(child): " + connectionFilterPattern.predicate(child));
+	                	if (child.attributes.filter == 'false' && !connectionFilterPattern.predicate(child)) {
 	                		filterConnectionGroup(child);
 	                	}
 	                });
 	                
 	                connectionGroup.childConnectionGroups = connectionGroup.childConnectionGroups.filter(function filterEmptyGroup(child) {
-	                    console.log(child);
-	                    console.log(child.name);
-	                    console.log(child.childConnectionGroups);
-	                    if (child.childConnectionGroups) {
-	                    	console.log(child.childConnectionGroups.length);
-	                    }
-	                    console.log(child.childConnections);
-	                    if (child.childConnections) {
-	                    	console.log(child.childConnections.length);
-	                    }
+//	                    console.log(child);
+//	                    console.log(child.name);
+//	                    console.log(child.childConnectionGroups);
+//	                    if (child.childConnectionGroups) {
+//	                    	console.log(child.childConnectionGroups.length);
+//	                    }
+//	                    console.log(child.childConnections);
+//	                    if (child.childConnections) {
+//	                    	console.log(child.childConnections.length);
+//	                    }
 	                    
 	                    if (child.childConnectionGroups) {
 	                    	if (child.childConnectionGroups.length > 0) {
-	                    		console.log('true');
+//	                    		console.log('true');
 	                    		return true;
 	                    	}
 	                    }
 	                    if (child.childConnections) {
 	                    	if (child.childConnections.length > 0) {
-	                    		console.log('true');
+//	                    		console.log('true');
 	                    		return true;
 	                    	}
 	                    }
-                		console.log('false');
+//                		console.log('false');
 	                    return false;
 	                });
                 }
@@ -318,7 +322,7 @@ angular.module('groupList').directive('guacGroupListFilter', [function guacGroup
                             filterGroupListItem(filteredGroup);
                         }
                         else {
-                        	console.log('updateFilteredConnectionGroup connectionGroup: ' + connectionGroup);
+//                        	console.log('updateFilteredConnectionGroup connectionGroup: ' + connectionGroup);
                             filteredGroup = flattenConnectionGroup(connectionGroup);
                             filterConnectionGroup(filteredGroup);
                         }
@@ -333,8 +337,8 @@ angular.module('groupList').directive('guacGroupListFilter', [function guacGroup
 
             // Recompile and refilter when pattern is changed
             $scope.$watch('searchString', function searchStringChanged(searchString) {
-                connectionFilterPattern.compile(searchString);
-                connectionGroupFilterPattern.compile(searchString);
+                connectionFilterPattern.compileConnectionFilter(searchString);
+                connectionGroupFilterPattern.compileConnectionGroupFilter(searchString);
                 updateFilteredConnectionGroups();
             });
 

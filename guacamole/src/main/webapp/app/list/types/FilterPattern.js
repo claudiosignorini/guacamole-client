@@ -221,7 +221,42 @@ angular.module('list').factory('FilterPattern', ['$injector',
          * @param {String} pattern
          *     The pattern to compile.
          */
-        this.compile = function compile(pattern) {
+        this.compileConnectionFilter = function compileConnectionFilter(pattern) {
+
+            // If no pattern provided, everything matches
+            if (!pattern) {
+                filterPattern.predicate = nullPredicate;
+                return;
+            }
+                
+            // Tokenize pattern, converting to lower case for case-insensitive matching
+            var tokens = FilterToken.tokenize(pattern.toLowerCase());
+
+            // Return predicate which matches against the value of any getter in the getters array
+            filterPattern.predicate = function matchesAllTokens(object) {
+
+                // False if any token does not match
+                for (var i=0; i < tokens.length; i++) {
+                    if (!matchesToken(object, tokens[i]))
+                        return false;
+                }
+
+                // True if all tokens matched
+                return true;
+
+            };
+            
+        };
+
+        /**
+         * Compiles the given pattern string, assigning the resulting filter
+         * predicate. The resulting predicate will accept only objects that
+         * match the given pattern.
+         * 
+         * @param {String} pattern
+         *     The pattern to compile.
+         */
+        this.compileConnectionGroupFilter = function compileConnectionGroupFilter(pattern) {
 
             // If no pattern provided, everything matches
             if (!pattern) {
@@ -236,7 +271,7 @@ angular.module('list').factory('FilterPattern', ['$injector',
             filterPattern.predicate = function matchesAllTokens(object) {
 
             	// CS: inizio modifiche
-            	if (object.type == 'ORGANIZATIONAL' && object.attributes.filter == 'false') {
+            	if (object.attributes.filter == 'false') {
                 	//console.log(object);
             		//console.log('attributes: ' + object.attributes);
             		//console.log('filter: ' + object.attributes.filter);
